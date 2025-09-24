@@ -15,4 +15,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             data = conn.recv(1024)
             if not data:
                 break
+            mensaje = data.decode('utf-8').strip()
+            if mensaje.lower() == "cerrar":
+                print("Cerrando conexión por solicitud del cliente.")
+                break
             conn.sendall(data)
