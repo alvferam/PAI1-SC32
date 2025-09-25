@@ -14,14 +14,18 @@ const mysql = require('mysql');
 // Configuración de la base de datos MariaDB
 const dbConfig = {
     host: 'localhost',
-    user: 'root',
-    password: 'X!208eGm0RSbMhtpt1IN4r3I', // Cambia si tienes contraseña
+    user: 'alvSSII',
+    password: 'ejemploprueba', // Cambia si tienes contraseña
     database: 'usuariosdb',
     port: 3306 // Cambia si tu MariaDB usa otro puerto
 };
 
+const crypto = require('crypto');
+
 app.post('/api/register', (req, res) => {
     const { usuario, clave } = req.body;
+    // Encriptar la contraseña con SHA-256
+    const claveHash = crypto.createHash('sha256').update(clave).digest('hex');
     const connection = mysql.createConnection(dbConfig);
     connection.connect();
     // Comprobar si el usuario ya existe
@@ -32,15 +36,15 @@ app.post('/api/register', (req, res) => {
         }
         if (results.length > 0) {
             connection.end();
-            return res.json({ exito: false, mensaje: 'El usuario ya existe' });
+            return res.json({ exito: false, mensaje: 'Usuario ya registrado.' });
         }
-        // Insertar nuevo usuario
-        connection.query('INSERT INTO usuarios (usuario, clave) VALUES (?, ?)', [usuario, clave], (err2) => {
+        // Insertar nuevo usuario con contraseña encriptada
+        connection.query('INSERT INTO usuarios (usuario, clave) VALUES (?, ?)', [usuario, claveHash], (err2) => {
             connection.end();
             if (err2) {
                 return res.status(500).json({ error: 'Error al crear usuario' });
             }
-            return res.json({ exito: true, mensaje: 'Usuario creado correctamente' });
+            return res.json({ exito: true, mensaje: 'Usuario registrado exitosamente.' });
         });
     });
 });
@@ -66,15 +70,35 @@ app.post('/api/send', (req, res) => {
                     // Enviar mensaje normal solo si no está vacío
                     client.write(mensajePendiente);
                 } else {
-                    respuesta = texto;
+                    respuesta = 'Inicio de sesión exitoso.';
                     client.destroy();
                 }
             } else {
-                respuesta = texto;
+                respuesta = 'Inicio de sesión fallido.';
                 client.destroy();
             }
         } else {
-            respuesta = texto;
+            // Si el mensaje es una transferencia, mostrar mensaje de integridad y registrar en BD
+            if (mensajePendiente && mensajePendiente.trim() !== '') {
+                respuesta = 'Transferencia realizada con integridad.';
+                // Registrar transacción en la base de datos
+                const partes = mensajePendiente.split(',');
+                if (partes.length === 3) {
+                    const [cuenta_origen, cuenta_destino, cantidad] = partes.map(x => x.trim());
+                    const connection = mysql.createConnection(dbConfig);
+                    connection.connect();
+                    connection.query(
+                        'INSERT INTO transacciones (cuenta_origen, cuenta_destino, cantidad) VALUES (?, ?, ?)',
+                        [cuenta_origen, cuenta_destino, cantidad],
+                        (err) => {
+                            connection.end();
+                            // Puedes manejar errores aquí si lo deseas
+                        }
+                    );
+                }
+            } else {
+                respuesta = texto;
+            }
             client.destroy();
         }
     });

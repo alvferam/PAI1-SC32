@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 </head>
 <body class="bg-light">
-    <div class="container py-5">
+    <div class="container py-5 text-center">
+        <img src="https://www.us.es/sites/default/files/inline-images/US-marca-digital_0.png" alt="Bienvenida" class="img-fluid mb-4" style="max-width:300px;">
         <h2 class="mb-4">Iniciar sesión</h2>
         <form id="formulario" style="display:block;">
             <div class="mb-3">
@@ -46,10 +47,15 @@
                 body: JSON.stringify({ usuario, clave, mensaje: '' })
             });
             const data = await res.json();
-            if (data.respuesta && data.respuesta.trim() === 'OK') {
+            if (data.respuesta && data.respuesta.toLowerCase().includes('exitoso')) {
+                localStorage.setItem('usuario', usuario);
+                localStorage.setItem('clave', clave);
                 window.location.href = 'secundaria.html';
             } else {
-                document.getElementById('respuesta').textContent = data.respuesta || data.error;
+                // Eliminar el símbolo '§' si aparece en el mensaje
+                let mensaje = data.respuesta || data.error;
+                if (mensaje) mensaje = mensaje.replace(/§/g, '');
+                document.getElementById('respuesta').textContent = mensaje;
             }
         });
         // Mostrar formulario de registro
@@ -76,7 +82,9 @@
                 body: JSON.stringify({ usuario, clave })
             });
             const data = await res.json();
-            document.getElementById('respuesta').textContent = data.mensaje || data.error;
+            let mensaje = data.mensaje || data.error;
+            if (mensaje) mensaje = mensaje.replace(/§/g, '');
+            document.getElementById('respuesta').textContent = mensaje;
             if (data.exito) {
                 setTimeout(() => {
                     document.getElementById('formulario').style.display = 'block';
