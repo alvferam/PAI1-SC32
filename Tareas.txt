@@ -1,0 +1,60 @@
+Requisitos funcionales
+1. Registro de usuarios:
+• Permitir que un nuevo usuario se registre proporcionando únicamente un nombre de
+usuario y una contraseña. OK
+• Informar al usuario si ya existe un registro con el mismo nombre de usuario. OK
+• No permitir modificaciones a los datos de usuarios después del registro. OK
+2. Inicio de sesión:
+• Permitir a los usuarios registrados iniciar sesión introduciendo su nombre de usuario y
+contraseña. OK
+3. Verificar credenciales:
+• Validar las credenciales proporcionadas contra los datos almacenados en el servidor. OK
+• Denegar acceso si las credenciales no coinciden con un registro válido. OK
+4. Cerrar sesión:
+• Permitir a los usuarios ya logados cerrar la sesión. OK
+5. Gestión de usuarios preexistentes:
+• El sistema debe contar con un conjunto inicial de usuarios registrados para que
+puedan acceder sin necesidad de registrarse.
+6. Transacciones:
+• Permitir a los usuarios autenticados realizar transacciones en el formato, no se debe
+validar cuentas o cantidades:
+o "Cuenta origen, Cuenta destino, Cantidad transferida". OK
+7. Persistencia de datos:
+• Registrar y almacenar de manera permanente:
+o Los datos de los usuarios. OK
+8. Interfaz de comunicación:
+• Proveer una interfaz (usando sockets) que permita a los clientes interactuar con el
+sistema de registro, autenticación, y transacciones. OK
+
+Requisitos de Información
+El sistema debe poder almacenar información relacionada con:
+1. Datos de usuarios:
+o Cada usuario debe tener:
+§ Nombre de usuario (único). OK
+§ Contraseña. OK
+2. Registro inicial:
+o El sistema debe contar con una base de datos inicial con:
+§ Una lista de usuarios pre-registrados. OK
+§ Sin transacciones realizadas previamente. OK
+El sistema debe gestionar la siguiente información:
+3. Transacciones:
+o Cada transacción debe incluir:
+§ Cuenta origen (identificador).OK
+§ Cuenta destino (identificador).OK
+§ Cantidad transferida (valor numérico).OK
+4. Mensajes del sistema:
+o Informar al usuario en las siguientes situaciones:
+§ Usuario registrado exitosamente. OK
+§ Usuario ya registrado. OK
+§ Inicio de sesión exitoso o fallido. OK
+§ Transferencia realizada con integridad OK 
+
+Requisitos de seguridad
+1. Requisitos de Seguridad para las Credenciales de Usuario
+• Almacenamiento Seguro de Credenciales OK
+• Verificación Segura de Credenciales OK
+• Protección Contra Ataques en Login (BruteForce) OK
+2. Requisitos de Seguridad para las Transacciones
+• Integridad en la Comunicación de Transacciones
+3. Requisitos de Seguridad para la Base de Datos
+• Integridad de los datos almacenados en base de datos. OK
