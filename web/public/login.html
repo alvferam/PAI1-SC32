@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <h2 class="mb-4">Iniciar sesión</h2>
+        <form id="formulario" style="display:block;">
+            <div class="mb-3">
+                <input type="text" id="usuario" class="form-control" placeholder="Usuario" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" id="clave" class="form-control" placeholder="Clave" required>
+            </div>
+            <button type="submit" class="btn btn-primary me-2">Login</button>
+            <button type="button" class="btn btn-secondary" id="btn-crear">Crear usuario</button>
+        </form>
+        <form id="form-registro" style="display:none;">
+            <h4 class="mb-3">Registro de usuario</h4>
+            <div class="mb-3">
+                <input type="text" id="nuevo_usuario" class="form-control" placeholder="Nuevo usuario" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" id="nueva_clave" class="form-control" placeholder="Nueva clave" required>
+            </div>
+            <button type="submit" class="btn btn-success">Registrar</button>
+            <button type="button" class="btn btn-link" id="btn-volver">Volver a login</button>
+        </form>
+        <div class="mt-4">
+            <pre id="respuesta" class="bg-white p-3 border"></pre>
+        </div>
+    </div>
+    <script>
+        // Login
+        document.getElementById('formulario').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const usuario = document.getElementById('usuario').value;
+            const clave = document.getElementById('clave').value;
+            const res = await fetch('/api/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ usuario, clave, mensaje: '' })
+            });
+            const data = await res.json();
+            if (data.respuesta && data.respuesta.trim() === 'OK') {
+                window.location.href = 'secundaria.html';
+            } else {
+                document.getElementById('respuesta').textContent = data.respuesta || data.error;
+            }
+        });
+        // Mostrar formulario de registro
+        document.getElementById('btn-crear').addEventListener('click', function() {
+            document.getElementById('formulario').style.display = 'none';
+            document.getElementById('form-registro').style.display = 'block';
+            document.getElementById('respuesta').textContent = '';
+        });
+        // Volver a login
+        document.getElementById('btn-volver').addEventListener('click', function() {
+            document.getElementById('formulario').style.display = 'block';
+            document.getElementById('form-registro').style.display = 'none';
+            document.getElementById('respuesta').textContent = '';
+        });
+        // Registro
+        document.getElementById('form-registro').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const usuario = document.getElementById('nuevo_usuario').value;
+            const clave = document.getElementById('nueva_clave').value;
+            // Enviar datos de registro al backend
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ usuario, clave })
+            });
+            const data = await res.json();
+            document.getElementById('respuesta').textContent = data.mensaje || data.error;
+            if (data.exito) {
+                setTimeout(() => {
+                    document.getElementById('formulario').style.display = 'block';
+                    document.getElementById('form-registro').style.display = 'none';
+                }, 1500);
+            }
+        });
+    </script>
+</body>
+</html>
